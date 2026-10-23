@@ -1,9 +1,9 @@
 export const SUPPLIERS = [
-  { id: '123roulement', name: '123 Roulement', domain: '123roulement.com', shippingCost: 6.90 },
-  { id: 'rs', name: 'RS Components', domain: 'fr.rs-online.com', shippingCost: 9.50 },
-  { id: 'manomano', name: 'ManoMano', domain: 'manomano.fr', shippingCost: 7.90 },
-  { id: 'amazon', name: 'Amazon', domain: 'amazon.fr', shippingCost: 4.90 },
-  { id: 'other', name: 'Autre fournisseur', domain: '', shippingCost: 8.00 },
+  { id: '123roulement', name: '123 Roulement', domain: '123roulement.com' },
+  { id: 'rs', name: 'RS Components', domain: 'fr.rs-online.com' },
+  { id: 'manomano', name: 'ManoMano', domain: 'manomano.fr' },
+  { id: 'amazon', name: 'Amazon', domain: 'amazon.fr' },
+  { id: 'other', name: 'Autre fournisseur', domain: '' },
 ];
 
 export const PROJECTS = [

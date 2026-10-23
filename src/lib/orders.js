@@ -3,7 +3,6 @@ import {
   addDoc,
   doc,
   updateDoc,
-  writeBatch,
   query,
   where,
   onSnapshot,
@@ -73,15 +72,4 @@ export async function changeStatus(id, status) {
     status,
     updatedAt: serverTimestamp(),
   });
-}
-
-export async function batchChangeStatus(orderIds, status) {
-  const batch = writeBatch(db);
-  orderIds.forEach((id) => {
-    batch.update(doc(db, 'orders', id), {
-      status,
-      updatedAt: serverTimestamp(),
-    });
-  });
-  return batch.commit();
 }

@@ -35,21 +35,6 @@
       </div>
     </section>
 
-    <!-- Bannière dynamique de mutualisation -->
-    <div v-if="mutualisationAlert" class="eco-banner">
-      <div class="eco-content">
-        <span class="eco-tag">🌱 MUTUALISATION D'ACHAT ACTIVE</span>
-        <p>
-          <strong>{{ mutualisationAlert.supplierName }} :</strong>
-          {{ mutualisationAlert.count }} commandes en cours sont regroupées ({{ mutualisationAlert.projects }}).
-          Économie estimée : <strong>{{ money(mutualisationAlert.savings) }}</strong> de livraison.
-        </p>
-      </div>
-      <RouterLink to="/new" class="text-link small">
-        Profiter du lot ↗
-      </RouterLink>
-    </div>
-
     <div class="section-title">
       <div>
         <span class="mono eyebrow muted">ACTIVITY / 01</span>
@@ -82,7 +67,7 @@ import { ref, computed, watch, onUnmounted } from 'vue';
 import { Plus, ArrowUpRight, ArrowRight } from 'lucide-vue-next';
 import { useAuth } from '../composables/useAuth';
 import { watchOrders } from '../lib/orders';
-import { money, SUPPLIERS } from '../lib/constants';
+import { money } from '../lib/constants';
 import OrderCard from '../components/OrderCard.vue';
 
 const { user, isAdmin, profile } = useAuth();
@@ -121,35 +106,4 @@ const approved = computed(() =>
 const totalBudget = computed(() =>
   orders.value.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
 );
-
-// Détecte si des commandes partagent un même fournisseur
-const mutualisationAlert = computed(() => {
-  const eligible = orders.value.filter((o) => ['pending', 'approved'].includes(o.status));
-  const counts = {};
-  const projects = {};
-
-  eligible.forEach((o) => {
-    const sId = o.supplierId || 'other';
-    counts[sId] = (counts[sId] || 0) + 1;
-    if (!projects[sId]) projects[sId] = new Set();
-    projects[sId].add(o.project);
-  });
-
-  const topSupplierId = Object.keys(counts).find((sId) => counts[sId] >= 2);
-  if (!topSupplierId) return null;
-
-  const supplierObj = SUPPLIERS.find((s) => s.id === topSupplierId) || {
-    name: topSupplierId,
-    shippingCost: 8,
-  };
-  const count = counts[topSupplierId];
-  const savings = (count - 1) * (supplierObj.shippingCost || 8);
-
-  return {
-    supplierName: supplierObj.name,
-    count,
-    projects: Array.from(projects[topSupplierId]).join(', '),
-    savings,
-  };
-});
 </script>

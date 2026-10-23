@@ -39,9 +39,6 @@
                   {{ s.name }}
                 </option>
               </select>
-              <span class="supplier-hint">
-                🌱 <em>Achat groupé :</em> Les commandes passées chez {{ supplier?.name }} sont mutualisées pour limiter les frais de livraison.
-              </span>
             </label>
 
             <label>
