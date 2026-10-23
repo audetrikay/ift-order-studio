@@ -2,7 +2,7 @@
 
 Application moderne **Vue 3 + Vite + Firebase** pour la gestion et le suivi des demandes de matériel des projets de l'Institut des Formations du Tourisme / FabLab IFT (Pôle Léonard de Vinci).
 
-## 🚀 Fonctionnalités
+## Fonctionnalités
 
 - **Authentification Firebase** : Inscription et connexion sécurisées par e-mail et mot de passe.
 - **Gestion des rôles (RBAC)** :
@@ -20,7 +20,7 @@ Application moderne **Vue 3 + Vite + Firebase** pour la gestion et le suivi des 
 
 ---
 
-## 🛠️ Installation & Démarrage local
+## Installation & Démarrage local
 
 ### 1. Prérequis
 - [Node.js](https://nodejs.org/) (version 20+ recommandée)
@@ -59,7 +59,7 @@ Ouvrez l'adresse indiquée (généralement `http://localhost:5173`).
 
 ---
 
-## 👑 Activer un compte Administrateur (Prof / Responsable)
+## Activer un compte Administrateur (Prof / Responsable)
 
 1. Créez un compte directement depuis la page d'inscription de l'application.
 2. Rendez-vous dans la **Firebase Console** → **Firestore Database** → collection **`users`**.
@@ -69,7 +69,7 @@ Ouvrez l'adresse indiquée (généralement `http://localhost:5173`).
 
 ---
 
-## 🔒 Déploiement des Règles Firestore
+## Déploiement des Règles Firestore
 
 Pour sécuriser la base de données :
 ```bash
@@ -81,7 +81,7 @@ firebase deploy --only firestore:rules
 
 ---
 
-## 🌐 Déploiement sur Firebase Hosting
+## Déploiement sur Firebase Hosting
 
 ```bash
 npm run build
@@ -93,7 +93,7 @@ firebase deploy --only hosting
 
 ---
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 ift-orders/
@@ -126,6 +126,6 @@ ift-orders/
 
 ---
 
-## 📄 Licence
+## Licence
 
 Projet réalisé dans le cadre du cours Web Tech - ESILV / Pôle Léonard de Vinci.
