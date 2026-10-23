@@ -11,12 +11,23 @@
     <div class="auth-panel">
       <div class="auth-card">
         <span class="mono eyebrow muted">MEMBER ACCESS / 01</span>
-        <h2>{{ signup ? 'créer un compte' : 'bienvenue.' }}</h2>
+
+        <!-- TITRES DYNAMIQUES SELON LE MODE -->
+        <h2>
+          {{ view === 'signup' ? 'créer un compte' : view === 'forgot' ? 'mot de passe oublié.' : 'bienvenue.' }}
+        </h2>
+
         <p class="muted">
-          {{ signup ? 'Rejoignez votre espace de commandes avec votre e-mail De Vinci.' : 'Connectez-vous à votre espace IFT.' }}
+          {{
+            view === 'signup'
+              ? 'Rejoignez votre espace de commandes avec votre e-mail De Vinci.'
+              : view === 'forgot'
+              ? 'Entrez votre adresse De Vinci pour réinitialiser votre mot de passe.'
+              : 'Connectez-vous à votre espace IFT.'
+          }}
         </p>
 
-        <div class="school-notice">
+        <div v-if="view === 'signup'" class="school-notice">
           🎓 Inscription réservée au domaine <strong>@edu.devinci.fr</strong> ou <strong>@devinci.fr</strong>
         </div>
 
@@ -24,8 +35,38 @@
           Firebase n'est pas configuré. Complétez votre fichier .env.
         </div>
 
-        <form @submit.prevent="submit" class="form-stack">
-          <label v-if="signup">
+        <div v-if="successMsg" class="success-banner">
+          {{ successMsg }}
+        </div>
+
+        <!-- FORMULAIRE RÉINITIALISATION MOT DE PASSE -->
+        <form v-if="view === 'forgot'" @submit.prevent="handleForgot" class="form-stack">
+          <label>
+            Adresse e-mail De Vinci
+            <input
+              v-model="email"
+              required
+              type="email"
+              placeholder="prenom.nom@edu.devinci.fr"
+            />
+          </label>
+
+          <div v-if="error" class="alert" role="alert">
+            {{ error }}
+          </div>
+
+          <button class="btn btn-dark" :disabled="!configured || busy">
+            {{ busy ? 'envoi en cours...' : 'envoyer le lien de réinitialisation →' }}
+          </button>
+
+          <button type="button" class="text-btn" @click="switchView('login')">
+            ← Retour à la connexion
+          </button>
+        </form>
+
+        <!-- FORMULAIRE CONNEXION OU INSCRIPTION -->
+        <form v-else @submit.prevent="handleSubmit" class="form-stack">
+          <label v-if="view === 'signup'">
             Nom complet
             <input v-model="name" required placeholder="Prénom Nom" />
           </label>
@@ -41,7 +82,17 @@
           </label>
 
           <label>
-            Mot de passe
+            <div class="label-with-link">
+              <span>Mot de passe</span>
+              <button
+                v-if="view === 'login'"
+                type="button"
+                class="inline-link"
+                @click="switchView('forgot')"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
             <input v-model="password" required minlength="6" type="password" placeholder="••••••••" />
           </label>
 
@@ -50,13 +101,17 @@
           </div>
 
           <button class="btn btn-dark" :disabled="!configured || busy">
-            {{ busy ? 'chargement...' : signup ? 'créer mon compte →' : 'se connecter →' }}
+            {{ busy ? 'chargement...' : view === 'signup' ? 'créer mon compte →' : 'se connecter →' }}
+          </button>
+
+          <button
+            type="button"
+            class="text-btn"
+            @click="switchView(view === 'signup' ? 'login' : 'signup')"
+          >
+            {{ view === 'signup' ? 'Déjà un compte ? Se connecter' : 'Pas de compte ? S’inscrire' }}
           </button>
         </form>
-
-        <button class="text-btn" @click="signup = !signup">
-          {{ signup ? 'Déjà un compte ? Se connecter' : 'Pas de compte ? S’inscrire' }}
-        </button>
       </div>
     </div>
   </div>
@@ -68,26 +123,58 @@ import { useRouter } from 'vue-router';
 import { useAuth, isDevinciEmail } from '../composables/useAuth';
 
 const router = useRouter();
-const { login, register, configured } = useAuth();
+const { login, register, resetPassword, configured } = useAuth();
 
-const signup = ref(false);
+const view = ref('login'); // 'login' | 'signup' | 'forgot'
 const name = ref('');
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const successMsg = ref('');
 const busy = ref(false);
 
-async function submit() {
+function switchView(newView) {
   error.value = '';
+  successMsg.value = '';
+  view.value = newView;
+}
 
-  if (signup.value && !isDevinciEmail(email.value)) {
+async function handleForgot() {
+  error.value = '';
+  successMsg.value = '';
+
+  if (!isDevinciEmail(email.value)) {
     error.value = "Seules les adresses officielles du Pôle Léonard de Vinci (@edu.devinci.fr ou @devinci.fr) sont autorisées.";
     return;
   }
 
   busy.value = true;
   try {
-    if (signup.value) {
+    await resetPassword(email.value);
+    successMsg.value = `Un e-mail contenant le lien de réinitialisation vient d'être envoyé à ${email.value}. Vérifiez votre messagerie Outlook De Vinci.`;
+  } catch (err) {
+    if (err.code === 'auth/user-not-found') {
+      error.value = "Aucun compte n'est associé à cette adresse e-mail.";
+    } else {
+      error.value = err.message || err.code;
+    }
+  } finally {
+    busy.value = false;
+  }
+}
+
+async function handleSubmit() {
+  error.value = '';
+  successMsg.value = '';
+
+  if (view.value === 'signup' && !isDevinciEmail(email.value)) {
+    error.value = "Seules les adresses officielles du Pôle Léonard de Vinci (@edu.devinci.fr ou @devinci.fr) sont autorisées.";
+    return;
+  }
+
+  busy.value = true;
+  try {
+    if (view.value === 'signup') {
       await register(email.value, password.value, name.value);
     } else {
       await login(email.value, password.value);
@@ -96,7 +183,11 @@ async function submit() {
   } catch (err) {
     if (err.code === 'auth/email-already-in-use') {
       error.value = "Cette adresse e-mail possède déjà un compte.";
-    } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+    } else if (
+      err.code === 'auth/wrong-password' ||
+      err.code === 'auth/user-not-found' ||
+      err.code === 'auth/invalid-credential'
+    ) {
       error.value = "Identifiants incorrects.";
     } else {
       error.value = err.message || err.code;

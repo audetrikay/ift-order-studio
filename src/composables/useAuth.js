@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -79,6 +80,14 @@ export function useAuth() {
     return cred;
   }
 
+  async function resetPassword(email) {
+    if (!email) throw new Error("Veuillez renseigner votre adresse e-mail.");
+    if (!isDevinciEmail(email)) {
+      throw new Error("Seules les adresses officielles du Pôle Léonard de Vinci (@edu.devinci.fr ou @devinci.fr) sont autorisées.");
+    }
+    return sendPasswordResetEmail(auth, email.trim());
+  }
+
   async function resendVerificationEmail() {
     if (auth.currentUser) {
       await sendEmailVerification(auth.currentUser);
@@ -108,6 +117,7 @@ export function useAuth() {
     isDevinciEmail,
     login,
     register,
+    resetPassword,
     resendVerificationEmail,
     reloadUser,
     logout,
