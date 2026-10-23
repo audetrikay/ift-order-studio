@@ -19,7 +19,7 @@
           class="btn btn-dark fast-review-btn"
           @click="openFastReview"
         >
-          ⚡ Revue Rapide ({{ pendingOrders.length }} en attente)
+          Revue Rapide ({{ pendingOrders.length }} en attente)
         </button>
       </div>
 
@@ -53,12 +53,12 @@
           <!-- Barre haute du mode Fast Review -->
           <div class="fast-review-top">
             <div class="fast-review-counter">
-              <span class="mono small">⚡ FAST REVIEW / ÉTAPE</span>
+              <span class="mono small">FAST REVIEW / ÉTAPE</span>
               <strong>{{ currentFastIndex + 1 }} sur {{ pendingOrders.length }}</strong>
             </div>
 
             <button type="button" class="icon-btn close-btn" @click="closeFastReview" title="Fermer [Échap]">
-              ✕
+              <X :size="18" />
             </button>
           </div>
 
@@ -96,7 +96,7 @@
 
             <!-- SOUS-PANNEAU : Déjà en stock au FabLab (Emplacement dans le lab) -->
             <div v-if="stockSelectorOpen" class="stock-selector-box">
-              <h4>📦 Indiquer l'emplacement du composant au FabLab :</h4>
+              <h4>Indiquer l'emplacement du composant au FabLab :</h4>
               <div class="stock-chips">
                 <button
                   type="button"
@@ -153,7 +153,7 @@
                 title="Touche [S]"
               >
                 <span class="key-badge">S</span>
-                📦 Déjà en stock au Lab
+                Déjà en stock au Lab
               </button>
 
               <button
@@ -222,6 +222,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { X } from 'lucide-vue-next';
 import { useAuth } from '../composables/useAuth';
 import { watchOrders, changeStatus } from '../lib/orders';
 import { money, STATUS_LABELS, STOCK_LOCATIONS } from '../lib/constants';

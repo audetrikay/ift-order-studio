@@ -20,7 +20,7 @@
 
       <!-- Encart Anti-gaspillage : Disponible en stock au FabLab -->
       <div v-if="order.status === 'in_stock'" class="stock-banner">
-        <div class="stock-banner-icon">📦</div>
+        <PackageCheck :size="28" class="stock-banner-icon" />
         <div>
           <span class="mono small">MATÉRIEL DÉJÀ DISPONIBLE AU FABLAB</span>
           <h3>Pas besoin d'attendre une commande !</h3>
@@ -111,6 +111,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { PackageCheck } from 'lucide-vue-next';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../composables/useAuth';

@@ -28,7 +28,7 @@
         </p>
 
         <div v-if="view === 'signup'" class="school-notice">
-          🎓 Inscription réservée au domaine <strong>@edu.devinci.fr</strong> ou <strong>@devinci.fr</strong>
+          Inscription réservée au domaine <strong>@edu.devinci.fr</strong> ou <strong>@devinci.fr</strong>
         </div>
 
         <div v-if="!configured" class="alert">
