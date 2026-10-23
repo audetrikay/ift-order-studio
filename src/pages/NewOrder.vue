@@ -9,6 +9,39 @@
       <span class="mono small muted">FORM / 001</span>
     </div>
 
+    <!-- Alerte si l'email de l'école n'est pas encore vérifié -->
+    <div v-if="!isEmailVerified" class="verification-card">
+      <div class="verification-header">
+        <span class="mono small">SÉCURITÉ & TRAÇABILITÉ / ÉTUDIANT</span>
+        <h3>e-mail de confirmation requis</h3>
+      </div>
+      <p>
+        Pour garantir la traçabilité des achats au FabLab IFT, vous devez confirmer votre adresse étudiante <strong>{{ user?.email }}</strong> avant de pouvoir soumettre cette commande.
+      </p>
+      <p class="small muted">
+        Consultez votre boîte mail <strong>Outlook De Vinci</strong> et cliquez sur le lien reçu lors de votre inscription.
+      </p>
+      <div class="verification-actions">
+        <button
+          type="button"
+          class="btn btn-outline small-btn"
+          :disabled="resending"
+          @click="handleResend"
+        >
+          {{ resending ? 'Envoi en cours...' : "Renvoyer l'e-mail de confirmation" }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-dark small-btn"
+          :disabled="checking"
+          @click="handleCheck"
+        >
+          {{ checking ? 'Vérification...' : "J'ai cliqué sur le lien (Actualiser)" }}
+        </button>
+      </div>
+      <div v-if="noticeMsg" class="verify-feedback">{{ noticeMsg }}</div>
+    </div>
+
     <form @submit.prevent="submit" class="order-form">
       <!-- Section 1 : Informations générales -->
       <section class="form-section">
@@ -152,8 +185,8 @@
             {{ error }}
           </div>
 
-          <button class="btn btn-dark submit" :disabled="busy">
-            {{ busy ? 'envoi...' : 'soumettre la demande' }} <ArrowRight :size="17" />
+          <button class="btn btn-dark submit" :disabled="busy || !isEmailVerified">
+            {{ busy ? 'envoi...' : !isEmailVerified ? 'vérifiez votre e-mail pour commander' : 'soumettre la demande' }} <ArrowRight :size="17" />
           </button>
 
           <p class="small muted">
@@ -174,7 +207,7 @@ import { createOrder } from '../lib/orders';
 import { SUPPLIERS, PROJECTS, money, isValidSupplierUrl } from '../lib/constants';
 
 const router = useRouter();
-const { user } = useAuth();
+const { user, isEmailVerified, resendVerificationEmail, reloadUser } = useAuth();
 
 const blankItem = () => ({ name: '', url: '', quantity: 1, unitPrice: '' });
 
@@ -188,7 +221,10 @@ const form = ref({
 });
 
 const error = ref('');
+const noticeMsg = ref('');
 const busy = ref(false);
+const resending = ref(false);
+const checking = ref(false);
 
 const supplier = computed(() => SUPPLIERS.find((s) => s.id === form.value.supplierId));
 
@@ -207,8 +243,43 @@ function removeItem(index) {
   form.value.items.splice(index, 1);
 }
 
+async function handleResend() {
+  resending.value = true;
+  noticeMsg.value = '';
+  try {
+    await resendVerificationEmail();
+    noticeMsg.value = `Un nouvel e-mail de confirmation a été envoyé à ${user.value?.email}.`;
+  } catch (e) {
+    noticeMsg.value = `Erreur : ${e.message}`;
+  } finally {
+    resending.value = false;
+  }
+}
+
+async function handleCheck() {
+  checking.value = true;
+  noticeMsg.value = '';
+  try {
+    await reloadUser();
+    if (isEmailVerified.value) {
+      noticeMsg.value = "Votre adresse e-mail est confirmée ! Vous pouvez maintenant commander.";
+    } else {
+      noticeMsg.value = "L'adresse n'apparaît pas encore comme vérifiée. Avez-vous cliqué sur le lien reçu dans votre messagerie ?";
+    }
+  } catch (e) {
+    noticeMsg.value = `Erreur : ${e.message}`;
+  } finally {
+    checking.value = false;
+  }
+}
+
 async function submit() {
   error.value = '';
+
+  if (!isEmailVerified.value) {
+    error.value = "Vous devez d'abord confirmer votre adresse e-mail De Vinci pour pouvoir soumettre une demande.";
+    return;
+  }
 
   if (!form.value.title.trim()) {
     error.value = 'Ajoutez un titre.';
@@ -245,4 +316,3 @@ async function submit() {
   }
 }
 </script>
-

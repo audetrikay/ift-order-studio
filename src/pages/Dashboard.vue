@@ -35,6 +35,25 @@
       </div>
     </section>
 
+    <!-- Rappel si l'email de l'école n'est pas encore vérifié -->
+    <div v-if="!isEmailVerified" class="verification-reminder">
+      <div>
+        <strong>Adresse e-mail étudiante en attente de confirmation</strong>
+        <p class="small muted">
+          Un lien a été envoyé à <code>{{ user?.email }}</code>. Confirmez-le pour pouvoir soumettre vos demandes au FabLab.
+        </p>
+        <span v-if="resendFeedback" class="small verify-feedback">{{ resendFeedback }}</span>
+      </div>
+      <button
+        type="button"
+        class="btn btn-outline small-btn"
+        :disabled="resending"
+        @click="triggerResend"
+      >
+        {{ resending ? 'Envoi...' : "Renvoyer l'e-mail" }}
+      </button>
+    </div>
+
     <div class="section-title">
       <div>
         <span class="mono eyebrow muted">ACTIVITY / 01</span>
@@ -70,9 +89,11 @@ import { watchOrders } from '../lib/orders';
 import { money } from '../lib/constants';
 import OrderCard from '../components/OrderCard.vue';
 
-const { user, isAdmin, profile } = useAuth();
+const { user, isAdmin, profile, isEmailVerified, resendVerificationEmail } = useAuth();
 const orders = ref([]);
 const error = ref('');
+const resending = ref(false);
+const resendFeedback = ref('');
 
 let unsubscribe = null;
 
@@ -98,6 +119,19 @@ watch([user, isAdmin], () => {
 onUnmounted(() => {
   if (unsubscribe) unsubscribe();
 });
+
+async function triggerResend() {
+  resending.value = true;
+  resendFeedback.value = '';
+  try {
+    await resendVerificationEmail();
+    resendFeedback.value = 'E-mail renvoyé avec succès !';
+  } catch (e) {
+    resendFeedback.value = `Erreur : ${e.message}`;
+  } finally {
+    resending.value = false;
+  }
+}
 
 const pending = computed(() => orders.value.filter((o) => o.status === 'pending').length);
 const approved = computed(() =>

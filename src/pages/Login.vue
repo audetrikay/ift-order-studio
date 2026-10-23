@@ -13,8 +13,12 @@
         <span class="mono eyebrow muted">MEMBER ACCESS / 01</span>
         <h2>{{ signup ? 'créer un compte' : 'bienvenue.' }}</h2>
         <p class="muted">
-          {{ signup ? 'Rejoignez votre espace de commandes.' : 'Connectez-vous à votre espace IFT.' }}
+          {{ signup ? 'Rejoignez votre espace de commandes avec votre e-mail De Vinci.' : 'Connectez-vous à votre espace IFT.' }}
         </p>
+
+        <div class="school-notice">
+          🎓 Inscription réservée au domaine <strong>@edu.devinci.fr</strong> ou <strong>@devinci.fr</strong>
+        </div>
 
         <div v-if="!configured" class="alert">
           Firebase n'est pas configuré. Complétez votre fichier .env.
@@ -27,8 +31,13 @@
           </label>
 
           <label>
-            Adresse e-mail
-            <input v-model="email" required type="email" placeholder="prenom@edu.devinci.fr" />
+            Adresse e-mail étudiante / enseignant
+            <input
+              v-model="email"
+              required
+              type="email"
+              placeholder="prenom.nom@edu.devinci.fr"
+            />
           </label>
 
           <label>
@@ -56,7 +65,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuth } from '../composables/useAuth';
+import { useAuth, isDevinciEmail } from '../composables/useAuth';
 
 const router = useRouter();
 const { login, register, configured } = useAuth();
@@ -70,6 +79,12 @@ const busy = ref(false);
 
 async function submit() {
   error.value = '';
+
+  if (signup.value && !isDevinciEmail(email.value)) {
+    error.value = "Seules les adresses officielles du Pôle Léonard de Vinci (@edu.devinci.fr ou @devinci.fr) sont autorisées.";
+    return;
+  }
+
   busy.value = true;
   try {
     if (signup.value) {
@@ -79,10 +94,15 @@ async function submit() {
     }
     router.push('/');
   } catch (err) {
-    error.value = err.code || err.message;
+    if (err.code === 'auth/email-already-in-use') {
+      error.value = "Cette adresse e-mail possède déjà un compte.";
+    } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+      error.value = "Identifiants incorrects.";
+    } else {
+      error.value = err.message || err.code;
+    }
   } finally {
     busy.value = false;
   }
 }
 </script>
-

@@ -3,6 +3,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -12,6 +13,12 @@ const user = ref(null);
 const profile = ref(null);
 const loading = ref(configured);
 let initialized = false;
+
+export function isDevinciEmail(email) {
+  if (!email) return false;
+  const lower = email.trim().toLowerCase();
+  return lower.endsWith('@edu.devinci.fr') || lower.endsWith('@devinci.fr');
+}
 
 function initAuth() {
   if (initialized || !configured || !auth) return;
@@ -39,13 +46,28 @@ export function useAuth() {
   initAuth();
 
   const isAdmin = computed(() => profile.value?.role === 'admin');
+  const isEmailVerified = computed(() => Boolean(user.value?.emailVerified));
 
   async function login(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
   async function register(email, password, name) {
+    if (!isDevinciEmail(email)) {
+      throw new Error(
+        "Adresse non autorisée : veuillez utiliser une adresse officielle du Pôle Léonard de Vinci (@edu.devinci.fr ou @devinci.fr)."
+      );
+    }
+
     const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+    // Envoi immédiat du lien de vérification par e-mail
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (e) {
+      console.warn("Impossible d'envoyer l'e-mail de confirmation:", e);
+    }
+
     const data = {
       displayName: name.trim(),
       email: cred.user.email,
@@ -55,6 +77,21 @@ export function useAuth() {
     await setDoc(doc(db, 'users', cred.user.uid), data);
     profile.value = data;
     return cred;
+  }
+
+  async function resendVerificationEmail() {
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser);
+    } else {
+      throw new Error('Aucun utilisateur connecté.');
+    }
+  }
+
+  async function reloadUser() {
+    if (auth.currentUser) {
+      await auth.currentUser.reload();
+      user.value = { ...auth.currentUser };
+    }
   }
 
   async function logout() {
@@ -67,9 +104,12 @@ export function useAuth() {
     loading,
     configured,
     isAdmin,
+    isEmailVerified,
+    isDevinciEmail,
     login,
     register,
+    resendVerificationEmail,
+    reloadUser,
     logout,
   };
 }
-

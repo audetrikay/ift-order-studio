@@ -3,6 +3,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function admin() { return signedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
+    function isDevinciEmail(email) {
+      return email.matches('.*@(edu[.])?devinci[.]fr$');
+    }
     function validItem(item) {
       return item is map && item.keys().hasOnly(['name','url','quantity','unitPrice'])
         && item.name is string && item.name.size() > 0 && item.name.size() <= 300
@@ -10,22 +13,24 @@ service cloud.firestore {
         && item.quantity is int && item.quantity >= 1 && item.quantity <= 10000
         && item.unitPrice is number && item.unitPrice >= 0 && item.unitPrice <= 100000;
     }
-    // Client-side rules can validate shape/permissions but cannot securely
-    // calculate and enforce the sum of a variable-length item array.
-    // Production financial totals should be recomputed by trusted backend code.
+
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || admin());
       allow create: if signedIn() && request.auth.uid == userId
         && request.resource.data.keys().hasOnly(['displayName','email','role','createdAt'])
         && request.resource.data.role == 'member'
         && request.resource.data.email == request.auth.token.email
+        && isDevinciEmail(request.resource.data.email)
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() > 0;
       allow update, delete: if false;
     }
+
     match /orders/{orderId} {
       allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin());
       allow create: if signedIn()
+        && request.auth.token.email_verified == true
+        && isDevinciEmail(request.resource.data.userEmail)
         && request.resource.data.keys().hasOnly(['title','supplierId','project','priority','notes','items','total','userId','userEmail','status','createdAt','updatedAt'])
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.userEmail == request.auth.token.email

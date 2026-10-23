@@ -90,3 +90,4 @@ const totalBudget = computed(() =>
   orders.value.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
 );
 </script>
+

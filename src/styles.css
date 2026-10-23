@@ -817,3 +817,66 @@ textarea {
   .auth-panel { padding: 50px 7%; }
   .footer span { display: none; }
 }
+
+/* ========================================================
+   STYLES DE TRAÇABILITÉ & VÉRIFICATION DES COMPTES ÉTUDIANTS
+   ======================================================== */
+
+.school-notice {
+  background: #edf3ee;
+  border: 1px solid #bdd4c1;
+  color: #2b5034;
+  padding: 11px 14px;
+  border-radius: 4px;
+  font-size: .83rem;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.verification-card {
+  background: #fdfaf3;
+  border: 1px solid #ebd9b5;
+  border-left: 4px solid #b68738;
+  padding: 24px;
+  border-radius: 4px;
+  margin-bottom: 35px;
+}
+
+.verification-header h3 {
+  font-family: 'Anton', sans-serif;
+  letter-spacing: -0.03em;
+  font-size: 1.5rem;
+  margin: 5px 0 10px;
+  color: #7d591c;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.verify-feedback {
+  margin-top: 12px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #274d36;
+}
+
+.verification-reminder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: #fcf9f2;
+  border: 1px solid #e7d6b3;
+  border-left: 4px solid #c2913e;
+  padding: 16px 22px;
+  border-radius: 4px;
+  margin-bottom: 35px;
+}
+
+.verification-reminder p {
+  margin: 4px 0 0;
+}
