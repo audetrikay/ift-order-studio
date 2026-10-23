@@ -18,6 +18,22 @@
         </span>
       </div>
 
+      <!-- Encart Anti-gaspillage : Disponible en stock au FabLab -->
+      <div v-if="order.status === 'in_stock'" class="stock-banner">
+        <div class="stock-banner-icon">📦</div>
+        <div>
+          <span class="mono small">MATÉRIEL DÉJÀ DISPONIBLE AU FABLAB</span>
+          <h3>Pas besoin d'attendre une commande !</h3>
+          <p>
+            Ces composants sont déjà en stock dans les réserves de l'école :
+            <strong>{{ order.stockLocation || 'Disponible auprès du responsable' }}</strong>.
+          </p>
+          <span class="small muted">
+            Vous pouvez passer les récupérer directement au FabLab IFT pour continuer votre projet.
+          </span>
+        </div>
+      </div>
+
       <div class="detail-grid">
         <div class="detail-box">
           <span class="mono eyebrow muted">ARTICLES</span>
@@ -56,19 +72,35 @@
             {{ order.notes || '—' }}
           </p>
 
+          <p v-if="order.stockLocation && order.status !== 'in_stock'">
+            <strong>Emplacement réserve</strong><br />
+            {{ order.stockLocation }}
+          </p>
+
           <div v-if="isAdmin" class="admin-controls">
             <label>
               Modifier le statut
               <select
                 :value="order.status"
                 :disabled="busy"
-                @change="updateStatus($event.target.value)"
+                @change="onStatusSelect($event.target.value)"
               >
                 <option v-for="s in STATUSES" :key="s" :value="s">
                   {{ STATUS_LABELS[s] }}
                 </option>
               </select>
             </label>
+
+            <div v-if="order.status === 'in_stock'" class="admin-stock-edit">
+              <label>
+                Emplacement dans le FabLab
+                <select :value="order.stockLocation" @change="updateLocation($event.target.value)">
+                  <option v-for="loc in STOCK_LOCATIONS" :key="loc" :value="loc">
+                    {{ loc }}
+                  </option>
+                </select>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -83,7 +115,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../composables/useAuth';
 import { changeStatus } from '../lib/orders';
-import { STATUS_LABELS, STATUSES, money, dateText } from '../lib/constants';
+import { STATUS_LABELS, STATUSES, STOCK_LOCATIONS, money, dateText } from '../lib/constants';
 
 const route = useRoute();
 const id = route.params.id;
@@ -115,10 +147,25 @@ onUnmounted(() => {
   if (unsubscribe) unsubscribe();
 });
 
-async function updateStatus(newStatus) {
+async function onStatusSelect(newStatus) {
   busy.value = true;
   try {
-    await changeStatus(id, newStatus);
+    const extra = {};
+    if (newStatus === 'in_stock' && !order.value.stockLocation) {
+      extra.stockLocation = STOCK_LOCATIONS[0];
+    }
+    await changeStatus(id, newStatus, extra);
+  } catch (e) {
+    error.value = e.message;
+  } finally {
+    busy.value = false;
+  }
+}
+
+async function updateLocation(newLocation) {
+  busy.value = true;
+  try {
+    await changeStatus(id, 'in_stock', { stockLocation: newLocation });
   } catch (e) {
     error.value = e.message;
   } finally {
@@ -126,4 +173,3 @@ async function updateStatus(newStatus) {
   }
 }
 </script>
-

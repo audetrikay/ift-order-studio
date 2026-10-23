@@ -897,3 +897,314 @@ textarea {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* ========================================================
+   STYLES DU STATUT "EN STOCK AU FABLAB" & MODE FAST REVIEW
+   ======================================================== */
+
+.status-in_stock {
+  color: #0d5f66;
+  background: #e3f5f7;
+  border-color: #a0dbe3;
+}
+
+:root[data-theme=dark] .status-in_stock {
+  background: #1e3b3e;
+  color: #9fe2ec;
+}
+
+.stock-banner {
+  display: flex;
+  gap: 18px;
+  background: #e9f6f8;
+  border: 1px solid #a6dde4;
+  border-left: 5px solid #14727b;
+  padding: 22px 24px;
+  border-radius: 4px;
+  margin-bottom: 30px;
+}
+
+.stock-banner-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.stock-banner h3 {
+  font-family: 'Anton', sans-serif;
+  letter-spacing: -0.03em;
+  font-size: 1.5rem;
+  margin: 4px 0 8px;
+  color: #0c4d53;
+  text-transform: lowercase;
+}
+
+.stock-banner p {
+  margin: 0 0 6px;
+  color: #124e54;
+  font-size: .95rem;
+}
+
+.admin-stock-edit {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+/* Modale et interface Fast Review */
+.fast-review-btn {
+  font-size: .9rem;
+}
+
+.fast-review-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 20, 18, 0.72);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.fast-review-card {
+  width: min(760px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  border-radius: 6px;
+  padding: 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.fast-review-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+}
+
+.fast-review-counter strong {
+  display: block;
+  font-family: 'Anton', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-top: 3px;
+}
+
+.close-btn {
+  font-size: 1.3rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.close-btn:hover {
+  background: var(--soft);
+}
+
+.fast-meta-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.fast-title {
+  font-size: 2.2rem;
+  margin: 6px 0 18px;
+}
+
+.fast-items-box {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  padding: 18px;
+  border-radius: 4px;
+  margin-bottom: 18px;
+}
+
+.fast-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .95rem;
+}
+
+.fast-item-row:last-of-type {
+  border-bottom: 0;
+}
+
+.fast-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.fast-total-row strong {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: -0.03em;
+}
+
+.fast-notes {
+  background: #fdfbf7;
+  border: 1px solid #ebd9b5;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 22px;
+}
+
+/* Actions rapides et touches clavier */
+.fast-actions-bar {
+  display: grid;
+  grid-template-columns: 1.4fr 1.6fr 1.1fr 1fr;
+  gap: 10px;
+  margin: 24px 0 16px;
+}
+
+.fast-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease;
+}
+
+.fast-btn:hover {
+  transform: translateY(-2px);
+}
+
+.key-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  font: 11px 'DM Mono', monospace;
+  font-weight: 700;
+}
+
+.btn-approve {
+  background: #274d36;
+  color: white;
+  border-color: #274d36;
+}
+
+.btn-approve .key-badge {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: white;
+}
+
+.btn-stock {
+  background: #0d5f66;
+  color: white;
+  border-color: #0d5f66;
+}
+
+.btn-stock .key-badge {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: white;
+}
+
+.btn-reject {
+  background: #fff4f2;
+  color: #9b372c;
+  border-color: #e5b3ad;
+}
+
+.btn-skip {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.fast-shortcuts-hint {
+  text-align: center;
+  padding-top: 10px;
+}
+
+/* Sélection d'emplacement dans le stock */
+.stock-selector-box {
+  background: #eef7f8;
+  border: 1px solid #b5e1e6;
+  padding: 20px;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+.stock-selector-box h4 {
+  margin: 0 0 12px;
+  font-size: .95rem;
+  color: #0b4e54;
+}
+
+.stock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stock-chip {
+  background: var(--surface);
+  border: 1px solid #a3d7dc;
+  color: #0d5f66;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: .8rem;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+
+.stock-chip.selected {
+  background: #0d5f66;
+  color: white;
+  border-color: #0d5f66;
+}
+
+.stock-confirm-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stock-confirm-row input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.fast-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.fast-empty h3 {
+  font-family: 'Anton', sans-serif;
+  font-size: 2rem;
+  text-transform: lowercase;
+}
+
+@media(max-width: 700px) {
+  .fast-actions-bar {
+    grid-template-columns: 1fr;
+  }
+}

@@ -20,7 +20,14 @@ export const PROJECTS = [
   'Other',
 ];
 
-export const STATUSES = ['pending', 'approved', 'rejected', 'ordered', 'received'];
+export const STATUSES = [
+  'pending',
+  'approved',
+  'rejected',
+  'ordered',
+  'received',
+  'in_stock',
+];
 
 export const STATUS_LABELS = {
   pending: 'En attente',
@@ -28,7 +35,17 @@ export const STATUS_LABELS = {
   rejected: 'Refusée',
   ordered: 'Commandée',
   received: 'Reçue',
+  in_stock: 'En stock au Lab',
 };
+
+export const STOCK_LOCATIONS = [
+  'Tiroir Électronique #1 (Arduino / ESP32)',
+  'Tiroir Électronique #2 (Capteurs & Modules)',
+  'Bacs Visserie & Fixations (Vis M3 / Roulements)',
+  'Étagère Moteurs & Servos',
+  'Bac Câbles, Dupont & Connecteurs',
+  'Armoire Outillage & Consommables',
+];
 
 export const money = (n) =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0);

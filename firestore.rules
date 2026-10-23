@@ -46,8 +46,8 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if admin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
-        && request.resource.data.status in ['pending','approved','rejected','ordered','received']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt','stockLocation','adminNote'])
+        && request.resource.data.status in ['pending','approved','rejected','ordered','received','in_stock']
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }

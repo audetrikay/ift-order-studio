@@ -67,9 +67,18 @@ export async function createOrder(user, form) {
   });
 }
 
-export async function changeStatus(id, status) {
-  return updateDoc(doc(db, 'orders', id), {
+export async function changeStatus(id, status, extra = {}) {
+  const updateData = {
     status,
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (extra.stockLocation !== undefined) {
+    updateData.stockLocation = extra.stockLocation;
+  }
+  if (extra.adminNote !== undefined) {
+    updateData.adminNote = extra.adminNote;
+  }
+
+  return updateDoc(doc(db, 'orders', id), updateData);
 }
